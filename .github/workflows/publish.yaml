@@ -1,0 +1,39 @@
+name: Publish Service Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      subpackages:
+        description: 'Subpackages to be built individually (e.g. monolith config ec2)'
+        default: 'monolith'
+        required: false
+      size:
+        description: "Number of smaller provider packages to build and push with each build job"
+        default: '30'
+        required: true
+      concurrency:
+        description: "Number of parallel package builds within each build job"
+        default: '1'
+        required: false
+      branch_name:
+        description: "Branch name to use while publishing the packages (e.g. main)"
+        default: ''
+        required: false
+      version:
+        description: "Version string to use while publishing the packages (e.g. v1.0.0-alpha.1)"
+        default: ''
+        required: false
+
+jobs:
+  publish-service-artifacts:
+    uses: sergenyalcin/provider-workflows/.github/workflows/provider-publish-service-artifacts.yml@main
+    with:
+      subpackages: ${{ github.event.inputs.subpackages }}
+      size: ${{ github.event.inputs.size }}
+      concurrency: ${{ github.event.inputs.concurrency }}
+      branch_name: ${{ github.event.inputs.branch_name }}
+      version: ${{ github.event.inputs.version }}
+      go-version: 1.23.6
+      cleanup-disk: false
+    secrets:
+      GHCR_PAT: ${{ secrets.GITHUB_TOKEN }}
